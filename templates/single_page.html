@@ -1,0 +1,78 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to ChatBot</title>
+</head>
+<body>
+    <h1>Voice to ChatBot</h1>
+    <button id="recordButton">Record Voice</button>
+    <p id="status">Status: Idle</p>
+    <p id="transcription"></p>
+    <p id="response"></p>
+
+    <script>
+        let recordButton = document.getElementById('recordButton');
+        let statusText = document.getElementById('status');
+        let transcriptionText = document.getElementById('transcription');
+        let responseText = document.getElementById('response');
+
+        let mediaRecorder;
+        let audioChunks = [];
+
+        recordButton.addEventListener('click', async () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                try {
+                    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        let audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' });
+                        let formData = new FormData();
+                        formData.append('audio_data', audioBlob, 'recording.mp3');
+
+                        statusText.textContent = 'Status: Processing...';
+
+                        try {
+                            let response = await fetch('/process_audio', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            let result = await response.json();
+
+                            if (response.ok) {
+                                transcriptionText.textContent =  result.transcription;
+                                responseText.textContent =  result.response;
+                                statusText.textContent = 'Status: Done';
+                            } else {
+                                statusText.textContent = 'Status: Error';
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            statusText.textContent = 'Status: Error';
+                        }
+
+                        audioChunks = [];
+                    };
+
+                    mediaRecorder.start();
+                    recordButton.textContent = 'Stop Recording';
+                    statusText.textContent = 'Status: Recording...';
+                } catch (error) {
+                    console.error('Error accessing microphone:', error);
+                    statusText.textContent = 'Status: Error accessing microphone';
+                }
+            } else if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                recordButton.textContent = 'Record Voice';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Assistant Chat</title>
+</head>
+<body>
+    <h1>Assistant</h1>
+    <div>
+        <h2>Chat History</h2>
+        {% for message in chat_history %}
+            {% if message.role == 'user' %}
+                <p><strong>You:</strong> {{ message.content }}</p>
+            {% elif message.role == 'assistant' %}
+                <p><strong>Bot:</strong> {{ message.content }}</p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <form method="post" action="/">
+        <input type="text" name="user_input" placeholder="Type something..." required>
+        <button type="submit">Send</button>
+    </form>
+    <br>
+    <form method="get" action="/clear">
+        <button type="submit">Clear Chat History</button>
+    </form>
+    <br>
+    <a href="/record">Go to Voice Recorder</a>
+</body>
+</html>
