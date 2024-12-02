@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import tempfile
 from openai import OpenAI
 from hezar.models import Model
 import os
+import requests
 
 # Load Whisper model
 model = Model.load("hezarai/whisper-small-fa")
@@ -19,7 +20,6 @@ def convert_voice_to_text(audio_data: bytes) -> str:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_audio_file:
         temp_audio_file.write(audio_data)
         audio_path = temp_audio_file.name
-
 
     transcripts = model.predict(audio_path)
     transcription = transcripts.get('text', 'Error: Transcription failed') if isinstance(transcripts, dict) else str(transcripts)
@@ -60,8 +60,19 @@ def process_audio():
     ]
     response_text = generate_text(chat_history)
 
-    # Return the response
-    return jsonify({'transcription': transcription, 'response': response_text})
+    # Call the FastAPI TTS service to convert response text to speech
+    tts_api_url = "http://localhost:8000/synthesize/"
+    tts_response = requests.post(tts_api_url, json={"text": response_text})
+
+    if tts_response.status_code == 200:
+        # Save the output audio to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio_file:
+            temp_audio_file.write(tts_response.content)
+            audio_path = temp_audio_file.name
+
+        return send_file(audio_path, mimetype="audio/wav", as_attachment=True, download_name="response_audio.wav")
+    else:
+        return jsonify({'error': 'Failed to generate speech'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
