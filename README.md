@@ -3,6 +3,8 @@
 
 This project is a **voice-to-voice chatbot** inspired by the capabilities of tools like ChatGPT. It utilizes open-source technologies to deliver a conversational AI experience entirely in the **Persian language**. By combining **Text-to-Speech (TTS)**, **Language Modeling (LM Studio)**, and **Automatic Speech Recognition (ASR)**, it creates a seamless environment for natural voice communication.
 
+![ezgif-1-f5e19345f5](https://github.com/user-attachments/assets/de8836be-7d32-4a11-81eb-cfab3fef97b3)
+
 ### Key Features:
 - **Voice-to-Voice Interaction:** Users can speak to the chatbot and receive spoken responses.
 - **Persian Language Support:** Focused on enhancing the experience for Persian-speaking users.
