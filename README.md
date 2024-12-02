@@ -29,7 +29,7 @@ For this project, we used the **[CohereForAI/aya-23b](https://huggingface.co/Coh
 
 - **Recommended Hardware:**
   - At least ** NVIDIA RTX 3070 GPU ** (or better for faster inference times).
-  - The inference time for Aya-23b on our setup (2x3070 GPUs) is less than 1 seconds per generation.
+  - The inference time for Aya-23b on our setup (2x3070 GPUs) is less than a second per generation.
 
 ### Setting Up the Model
 1. Download the model weights from Hugging Face: [Aya-23b Model](https://huggingface.co/CohereForAI/aya-23-8B).
